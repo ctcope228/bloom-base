@@ -6,10 +6,15 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        green: '#5f8b4c',
-        pink: '#ff9a9a',
-        cream: '#ffddab',
-        brown: '#945034',
+        mygreen: '#5f8b4c',
+        mypink: '#ff9a9a',
+        mycream: '#ffddab',
+        mybrown: '#945034',
+      },
+      fontFamily: {
+        heading: ["Unna_700Bold", "serif"],
+        body: ["Jost_400Regular", "sans-serif"],
+        bodyBold: ["Jost_500Medium", "sans-serif"],
       }
     },
   },

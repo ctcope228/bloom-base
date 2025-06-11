@@ -1,12 +1,12 @@
 import {StyleSheet, Text, View} from 'react-native'
 import React from 'react'
 
-const Plants = () => {
+const Flowers = () => {
     return (
         <View>
-            <Text>Plants</Text>
+            <Text>Flowers</Text>
         </View>
     )
 }
-export default Plants
+export default Flowers
 const styles = StyleSheet.create({})

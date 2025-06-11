@@ -1,12 +1,12 @@
 import {StyleSheet, Text, View} from 'react-native'
 import React from 'react'
 
-const Bouquets = () => {
+const Products = () => {
     return (
         <View>
-            <Text>Bouquets</Text>
+            <Text>Products</Text>
         </View>
     )
 }
-export default Bouquets
+export default Products
 const styles = StyleSheet.create({})
