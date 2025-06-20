@@ -11,7 +11,7 @@ const DashboardCard = ({name, description, onPress}: Props) => {
     return (
         <TouchableOpacity
             onPress={onPress}
-            className="bg-stone-200 gap-2 p-5 rounded-xl shadow-sm w-[47%] h-[275px]"
+            className="bg-stone-200 gap-2 p-5 rounded-xl shadow-sm w-[47%] h-[38%]"
         >
             <Text className="text-3xl font-bodyBold text-mygreen">{name}</Text>
             <Text className="text-xl font-body text-stone-500">{description}</Text>
