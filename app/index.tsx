@@ -5,7 +5,6 @@ import {onAuthStateChanged, User} from "@firebase/auth";
 import {FIREBASE_AUTH} from "@/firebase-config";
 import LoginScreen from "@/app/screens/login";
 import DashboardScreen from "@/app/screens/dashboard";
-import {NavigationContainer} from "@react-navigation/native";
 
 const Stack = createNativeStackNavigator();
 

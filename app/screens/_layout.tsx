@@ -12,6 +12,13 @@ const _Layout = () => {
                     headerShown: false,
                 }}
             />
+            <Stack.Screen
+                name="search"
+                options={{
+                    title: 'Search',
+                    headerShown: false,
+                }}
+            />
         </Stack>
     )
 }
