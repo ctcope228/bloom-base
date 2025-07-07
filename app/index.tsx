@@ -18,12 +18,14 @@ export default function RootNavigator() {
       });
   }, []);
   return (
-      <Stack.Navigator initialRouteName="Login">
-          {user ? (
-              <Stack.Screen name="Dashboard" component={DashboardScreen} options={{ headerShown: false }} />
-          ) :  (
-              <Stack.Screen name="Login" component={LoginScreen} options={{ headerShown: false }} />
-          )}
-      </Stack.Navigator>
+      <>
+          <Stack.Navigator initialRouteName="Login">
+              {user ? (
+                  <Stack.Screen name="Dashboard" component={DashboardScreen} options={{ headerShown: false }} />
+              ) :  (
+                  <Stack.Screen name="Login" component={LoginScreen} options={{ headerShown: false }} />
+              )}
+          </Stack.Navigator>
+      </>
   );
 }

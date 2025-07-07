@@ -10,6 +10,7 @@ import * as SplashScreen from "expo-splash-screen";
 import React, { useEffect } from "react";
 import { Stack } from "expo-router";
 import './globals.css';
+import FlashMessage from "react-native-flash-message";
 
 export default function RootLayout() {
     const [fontsLoaded] = useFonts({
@@ -25,19 +26,22 @@ export default function RootLayout() {
     }, [fontsLoaded]);
 
     if (!fontsLoaded) return null;
-  return (
-      <Stack >
-          <Stack.Screen
-              name="index"
-              options={{
-                  title: 'RootNavigator',
-                  headerShown: false,
-              }}
-          />
-          <Stack.Screen
-              name="screens"
-              options={{ headerShown: false }}
-          />
-      </Stack>
+    return (
+        <>
+        <Stack >
+            <Stack.Screen
+                name="index"
+                options={{
+                    title: 'RootNavigator',
+                    headerShown: false,
+                }}
+            />
+            <Stack.Screen
+                name="screens"
+                options={{ headerShown: false }}
+            />
+        </Stack>
+            <FlashMessage position="bottom" />
+            </>
   )
 }

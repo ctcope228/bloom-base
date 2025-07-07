@@ -13,7 +13,13 @@ export interface BaseFlower {
     };
 }
 
-export interface FlowerDetail extends BaseFlower {
+export interface FlowerDetail {
+    common_name?:       string;
+    scientific_name?:   string;
+    default_image?: {
+        medium_url?:    string;
+        thumbnail?:     string;
+    };
     cycle?:             string;
     watering?:          string;
     sunlight?:          string[];
@@ -80,7 +86,6 @@ export async function fetchFlowerDetails(
     }
 
     const json = await res.json() as Partial<FlowerDetail> & {
-        id:                 number;
         common_name?:       string;
         scientific_name?:   string;
         default_image?:     { thumbnail?: string; medium_url?: string; };
@@ -93,7 +98,6 @@ export async function fetchFlowerDetails(
     };
 
     return {
-        id:              json.id,
         common_name:     json.common_name ?? "Unknown species",
         scientific_name: json.scientific_name ?? "",
         default_image:   json.default_image

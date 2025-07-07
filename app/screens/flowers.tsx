@@ -26,6 +26,7 @@ import * as ImagePicker from 'expo-image-picker';
 import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import FlowerCard from '@/components/FlowerCard';
 import { router } from 'expo-router';
+import {Feather} from "@expo/vector-icons";
 
 //
 // ─── TYPES ─────────────────────────────────────────────────────────────────────
@@ -120,7 +121,7 @@ const Flowers = () => {
     // ── Pick an image ───────────────────────────────────────────────────────────
     const pickImage = async () => {
         const result = await ImagePicker.launchImageLibraryAsync({
-            mediaTypes: ImagePicker.MediaTypeOptions.Images,
+            mediaTypes: ['images'],
             quality: 0.8,
         });
         if (!result.canceled && result.assets.length > 0) {
@@ -215,7 +216,7 @@ const Flowers = () => {
                     data={flowers}
                     keyExtractor={(item) => item.id}
                     numColumns={2}
-                    className="bg-stone-300 border-t border-stone-300 w-full shadow-md"
+                    className="bg-stone-300 w-full shadow-inner"
                     renderItem={({ item }) => (
                         <FlowerCard
                             common_name={item.common_name}
@@ -307,28 +308,32 @@ const Flowers = () => {
                     className="flex-1"
                 >
                     <View className="flex-1 justify-center items-center bg-black/50 px-6">
-                        <View className="bg-stone-300 rounded-xl p-6 w-full">
-                            <Text className="text-xl font-bodyBold text-center mb-4 text-mygreen">
+                        <View className="flex-wrap flex-row justify-around bg-stone-300 rounded-2xl p-6 w-full">
+                            <Text className="w-full text-2xl font-bodyBold text-center m-2 mb-6 text-mygreen">
                                 {form.id ? 'Edit Flower' : 'Add New Flower'}
                             </Text>
 
-                            <View className="p-2 rounded-full">
-                                <Button
-                                    title="Search"
-                                    color="#5f8b4c"
-                                    onPress={() => {
-                                        router.push('/screens/search');
-                                        setModalVisible(false);
-                                    }}
-                                />
-                            </View>
+                            {!form.id &&
+                            <TouchableOpacity
+                                className="flex-row mb-4 p-2 px-4 gap-2 rounded-xl bg-stone-200"
+                                onPress={() => {
+                                    router.push('/screens/search');
+                                    setModalVisible(false);
+                                }}
+                            >
+                                <Text className="text-mygreen font-body text-xl">
+                                    Search
+                                </Text>
+                                <Feather name="search" size={23} color="#5f8b4c" />
+                            </TouchableOpacity>
+                        }
 
-                            <Text className="text-lg mb-5 font-body text-center text-mygreen">
-                                Or
+                            <Text className="text-xl mb-5 font-body text-center text-mygreen w-full">
+                                Manual Entry
                             </Text>
 
                             <TextInput
-                                className="bg-stone-200 p-3 mb-2 rounded-lg"
+                                className="bg-stone-200 p-3 mb-4 rounded-xl w-[45%]"
                                 placeholder="Name"
                                 placeholderTextColor="#a8a29e"
                                 value={form.common_name}
@@ -337,7 +342,7 @@ const Flowers = () => {
                                 }
                             />
                             <TextInput
-                                className="bg-stone-200 p-3 mb-2 rounded-lg"
+                                className="bg-stone-200 p-3 mb-4 rounded-xl w-[45%]"
                                 placeholder="Alternate Name"
                                 placeholderTextColor="#a8a29e"
                                 value={form.scientific_name}
@@ -348,7 +353,7 @@ const Flowers = () => {
 
                             <TouchableOpacity
                                 onPress={pickImage}
-                                className="mb-4 items-center"
+                                className="mb-4 items-center w-full"
                             >
                                 {form.localImageUri ? (
                                     <Image
@@ -356,12 +361,14 @@ const Flowers = () => {
                                         style={{ width: 100, height: 100 }}
                                     />
                                 ) : (
-                                    <Text>Select Image</Text>
+                                    <View className="bg-stone-200 rounded-xl p-4 w-[95%]">
+                                        <Text className="text-center text-stone-400">Image</Text>
+                                    </View>
                                 )}
                             </TouchableOpacity>
 
                             <TextInput
-                                className="bg-stone-200 p-3 mb-2 rounded-lg"
+                                className="bg-stone-200 p-3 mb-4 rounded-xl w-[45%]"
                                 placeholder="Season"
                                 placeholderTextColor="#a8a29e"
                                 value={form.flowering_season}
@@ -370,14 +377,14 @@ const Flowers = () => {
                                 }
                             />
                             <TextInput
-                                className="bg-stone-200 p-3 mb-2 rounded-lg"
+                                className="bg-stone-200 p-3 mb-4 rounded-xl w-[45%]"
                                 placeholder="Cycle"
                                 placeholderTextColor="#a8a29e"
                                 value={form.cycle}
                                 onChangeText={(text) => setForm({ ...form, cycle: text })}
                             />
                             <TextInput
-                                className="bg-stone-200 p-3 mb-2 rounded-lg"
+                                className="bg-stone-200 p-3 mb-4 rounded-xl w-[45%]"
                                 placeholder="Watering"
                                 placeholderTextColor="#a8a29e"
                                 value={form.watering}
@@ -386,7 +393,7 @@ const Flowers = () => {
                                 }
                             />
                             <TextInput
-                                className="bg-stone-200 p-3 mb-2 rounded-lg"
+                                className="bg-stone-200 p-3 mb-4 rounded-xl w-[45%]"
                                 placeholder="Sunlight"
                                 placeholderTextColor="#a8a29e"
                                 value={form.sunlight}
@@ -394,32 +401,28 @@ const Flowers = () => {
                                     setForm({ ...form, sunlight: text })
                                 }
                             />
-
-                            <View className="flex-row justify-between space-x-2">
-                                <TextInput
-                                    className="bg-stone-200 p-3 mb-2 flex-1 rounded-lg"
-                                    placeholder="Hardiness Min"
-                                    placeholderTextColor="#a8a29e"
-                                    keyboardType="numeric"
-                                    value={form.hardinessMin}
-                                    onChangeText={(text) =>
-                                        setForm({ ...form, hardinessMin: text })
-                                    }
-                                />
-                                <TextInput
-                                    className="bg-stone-200 p-3 mb-2 flex-1 rounded-lg"
-                                    placeholder="Hardiness Max"
-                                    placeholderTextColor="#a8a29e"
-                                    keyboardType="numeric"
-                                    value={form.hardinessMax}
-                                    onChangeText={(text) =>
-                                        setForm({ ...form, hardinessMax: text })
-                                    }
-                                />
-                            </View>
-
                             <TextInput
-                                className="bg-stone-200 p-3 mb-4 rounded-lg"
+                                className="bg-stone-200 p-3 mb-4 rounded-xl w-[45%]"
+                                placeholder="Hardiness Min"
+                                placeholderTextColor="#a8a29e"
+                                keyboardType="numeric"
+                                value={form.hardinessMin}
+                                onChangeText={(text) =>
+                                    setForm({ ...form, hardinessMin: text })
+                                }
+                            />
+                            <TextInput
+                                className="bg-stone-200 p-3 mb-4 rounded-xl w-[45%]"
+                                placeholder="Hardiness Max"
+                                placeholderTextColor="#a8a29e"
+                                keyboardType="numeric"
+                                value={form.hardinessMax}
+                                onChangeText={(text) =>
+                                    setForm({ ...form, hardinessMax: text })
+                                }
+                            />
+                            <TextInput
+                                className="bg-stone-200 p-3 mb-4 rounded-xl w-[95%] h-20"
                                 placeholder="Description"
                                 placeholderTextColor="#a8a29e"
                                 value={form.description}
@@ -428,17 +431,16 @@ const Flowers = () => {
                                 }
                             />
 
-                            <View className="flex-row justify-between">
-                                <Button
-                                    title="Cancel"
-                                    color="#5f8b4c"
-                                    onPress={() => {
-                                        setModalVisible(false);
-                                        setForm(initialForm);
-                                    }}
-                                />
-                                <Button title="Save" color="#5f8b4c" onPress={handleSave} />
-                            </View>
+                            <Button
+                                title="Cancel"
+                                color="#5f8b4c"
+                                onPress={() => {
+                                    setModalVisible(false);
+                                    setForm(initialForm);
+                                }}
+                            />
+                            <Button title="Save" color="#5f8b4c" onPress={handleSave} />
+
                         </View>
                     </View>
                 </KeyboardAvoidingView>

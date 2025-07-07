@@ -1,9 +1,17 @@
-import {View, Text, ActivityIndicator, FlatList, Button, Modal, Image} from 'react-native'
+import {View, Text, ActivityIndicator, FlatList, Button, Modal, Image, Alert} from 'react-native'
 import React, {useEffect, useState} from 'react'
 import FlowerSearchBar from "@/components/FlowerSearchBar";
 import FlowerCard from "@/components/FlowerCard";
 import {useFetch} from "@/services/usefetch"
-import {BaseFlower, fetchFlowerDetails, fetchFlowerList, FlowerDetail} from "@/services/api";
+import {fetchFlowerDetails, fetchFlowerList, FlowerDetail} from "@/services/api";
+import {addDoc, collection} from "@firebase/firestore";
+import {FIREBASE_DB} from "@/firebase-config";
+import { showMessage } from "react-native-flash-message";
+import {Feather} from "@expo/vector-icons";
+
+function Icon(props: { name: string, size: number, color: string }) {
+    return null;
+}
 
 const Search = () => {
     const [query, setQuery]           = useState("");
@@ -41,6 +49,31 @@ const Search = () => {
         }
     };
 
+    const handleSave = async ()  => {
+        try {
+            if (detail?.common_name) {
+                await addDoc(collection(FIREBASE_DB, 'flowers'), detail);
+
+                showMessage({
+                    message: "Saved",
+                    type: "success",
+                    duration: 2000,
+                    color: "#5F8B4C",
+                    backgroundColor: "rgba(0,0,0,0.0)",
+                    titleStyle: {
+                        textAlign: "center",
+                        fontSize: 18,
+                    },
+                });
+
+                setDetail(null);
+            }
+        } catch (err) {
+            console.error(err);
+            Alert.alert('Error', 'Could not save flower');
+        }
+    }
+
     return (
         <View className="flex-1 bg-stone-200 items-center">
             <Text className="text-4xl mt-28 mb-4 font-bodyBold color-mygreen">
@@ -58,7 +91,7 @@ const Search = () => {
             {listError && <Text>Error: {listError.message}</Text>}
 
             <FlatList
-                className="bg-stone-300 border-t border-stone-300 w-full shadow-md"
+                className="bg-stone-300 w-full shadow-md"
                 numColumns={2}
                 data={results}
                 keyExtractor={f => f.id.toString()}
@@ -88,9 +121,10 @@ const Search = () => {
                         {detail?.hardiness && <Text className="font-body text-stone-600 mb-1">Hardiness: Min: {detail?.hardiness.min}, Max: {detail?.hardiness.max}</Text>}
                         <Text className="font-body text-stone-600 mb-1">Description: {detail?.description}</Text>
 
-                        <View className="flex-row justify-center mt-4">
+                        <View className="flex-row justify-between mt-4">
                             <Button title="Close" color="#5f8b4c" onPress={() => setDetail(null)} />
 
+                            <Button title="Save" color="#5f8b4c" onPress={handleSave} />
                         </View>
                     </View>
                 </View>

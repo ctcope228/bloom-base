@@ -1,9 +1,10 @@
-
-import React from 'react'
 import {Stack} from "expo-router";
+import FlashMessage from "react-native-flash-message";
+import React from "react";
 
 const _Layout = () => {
     return (
+        <>
         <Stack>
             <Stack.Screen
                 name="flowers"
@@ -20,6 +21,8 @@ const _Layout = () => {
                 }}
             />
         </Stack>
+        <FlashMessage position="bottom" />
+        </>
     )
 }
 export default _Layout

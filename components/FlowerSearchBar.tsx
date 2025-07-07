@@ -23,7 +23,7 @@ const FlowerSearchBar: React.FC<Props> = ({
                                           }) => {
     return (
         <View
-            className="flex-row items-center bg-dark-200 rounded-full px-4 py-2"
+            className="flex-row items-center justify-center bg-dark-200 rounded-full px-4 py-2"
             style={containerStyle}
         >
             {/* Search icon */}
@@ -32,20 +32,19 @@ const FlowerSearchBar: React.FC<Props> = ({
                 hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
                 accessibilityLabel="Search"
             >
-                <Feather name="search" size={20} color="#A8B5DB" />
+                <Feather name="search" size={20} color="#5F8B4C" />
             </TouchableOpacity>
 
             {/* Text input */}
             <TextInput
-                className="flex-1 ml-2 text-white"
+                className="flex-1 ml-2 text-mygreen"
                 placeholder={placeholder}
-                placeholderTextColor="#A8B5DB"
+                placeholderTextColor="#5f8b4c"
                 value={value}
                 onChangeText={onChangeText}
                 returnKeyType="search"
                 onSubmitEditing={onSearch}
                 autoCorrect={false}
-                autoCapitalize="none"
                 clearButtonMode="never"
             />
 
@@ -56,7 +55,7 @@ const FlowerSearchBar: React.FC<Props> = ({
                     hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
                     accessibilityLabel="Clear text"
                 >
-                    <Feather name="x" size={20} color="#A8B5DB" />
+                    <Feather name="x" size={20} color="#5F8B4C" />
                 </TouchableOpacity>
             ) : null}
         </View>
