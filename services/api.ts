@@ -1,3 +1,5 @@
+import {Flower} from "@/types/flower";
+
 export const PERENUAL_CONFIG = {
     BASE_URL: "https://perenual.com/api/v2",
     API_KEY: process.env.EXPO_PUBLIC_PERENUAL_API_KEY!,
@@ -11,21 +13,6 @@ export interface BaseFlower {
         medium_url?:    string;
         thumbnail?:     string;
     };
-}
-
-export interface FlowerDetail {
-    common_name?:       string;
-    scientific_name?:   string;
-    default_image?: {
-        medium_url?:    string;
-        thumbnail?:     string;
-    };
-    cycle?:             string;
-    watering?:          string;
-    sunlight?:          string[];
-    hardiness?: {min?: number, max?: number};
-    flowering_season?:  string;
-    description?:       string;
 }
 
 export async function fetchFlowerList(
@@ -77,7 +64,7 @@ export async function fetchFlowerList(
  */
 export async function fetchFlowerDetails(
     id: number
-): Promise<FlowerDetail> {
+): Promise<Flower> {
     const url = `${PERENUAL_CONFIG.BASE_URL}/species/details/${id}?key=${PERENUAL_CONFIG.API_KEY}`;
 
     const res = await fetch(url);
@@ -85,7 +72,7 @@ export async function fetchFlowerDetails(
         throw new Error(`Perennial detail fetch failed: ${res.statusText}`);
     }
 
-    const json = await res.json() as Partial<FlowerDetail> & {
+    const json = await res.json() as Partial<Flower> & {
         common_name?:       string;
         scientific_name?:   string;
         default_image?:     { thumbnail?: string; medium_url?: string; };

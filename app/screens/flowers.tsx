@@ -25,40 +25,10 @@ import {
 import * as ImagePicker from 'expo-image-picker';
 import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import FlowerCard from '@/components/FlowerCard';
-import { router } from 'expo-router';
+import {router, useRouter} from 'expo-router';
 import {Feather} from "@expo/vector-icons";
-
-//
-// ─── TYPES ─────────────────────────────────────────────────────────────────────
-//
-
-interface Flower {
-    id: string;
-    common_name?: string;
-    scientific_name?: string;
-    cycle?: string;
-    watering?: string;
-    sunlight?: string | string[];
-    hardiness?: { min: number; max: number };
-    flowering_season?: string;
-    description?: string;
-    default_image?: { thumbnail: string; medium_url: string };
-}
-
-// form state: all strings, so it maps 1:1 to TextInputs
-type FlowerForm = {
-    id: string;
-    common_name: string;
-    scientific_name: string;
-    cycle: string;
-    watering: string;
-    sunlight: string;
-    flowering_season: string;
-    description: string;
-    hardinessMin: string;
-    hardinessMax: string;
-    localImageUri: string | null;
-};
+import {Flower, FlowerForm} from "@/types/flower";
+import DetailsModal from "@/components/DetailsModal";
 
 const initialForm: FlowerForm = {
     id: '',
@@ -74,10 +44,6 @@ const initialForm: FlowerForm = {
     localImageUri: null,
 };
 
-//
-// ─── COMPONENT ────────────────────────────────────────────────────────────────
-//
-
 const Flowers = () => {
     const [flowers, setFlowers] = useState<Flower[]>([]);
     const [selectedFlower, setSelectedFlower] = useState<Flower | null>(null);
@@ -85,7 +51,8 @@ const Flowers = () => {
     const [form, setForm] = useState<FlowerForm>(initialForm);
     const [loadingList, setLoadingList] = useState(false);
 
-    // ── Fetch all flowers ───────────────────────────────────────────────────────
+    const router = useRouter();
+
     const getFlowers = async () => {
         setLoadingList(true);
         try {
@@ -107,7 +74,6 @@ const Flowers = () => {
         getFlowers();
     }, []);
 
-    // ── Delete a flower ─────────────────────────────────────────────────────────
     const deleteFlower = async (id: string) => {
         try {
             await deleteDoc(doc(FIREBASE_DB, 'flowers', id));
@@ -118,7 +84,6 @@ const Flowers = () => {
         }
     };
 
-    // ── Pick an image ───────────────────────────────────────────────────────────
     const pickImage = async () => {
         const result = await ImagePicker.launchImageLibraryAsync({
             mediaTypes: ['images'],
@@ -129,7 +94,6 @@ const Flowers = () => {
         }
     };
 
-    // ── Helpers to open the add/edit modal ─────────────────────────────────────
     const openAddForm = () => {
         setForm(initialForm);
         setModalVisible(true);
@@ -152,7 +116,6 @@ const Flowers = () => {
         setModalVisible(true);
     };
 
-    // ── Save (add or update) ───────────────────────────────────────────────────
     const handleSave = async () => {
         if (!form.common_name.trim()) {
             return Alert.alert('Validation', 'Please enter a name');
@@ -174,7 +137,6 @@ const Flowers = () => {
         };
 
         try {
-            // upload image if any
             if (form.localImageUri) {
                 const storage = getStorage();
                 const imgRef = ref(storage, `flowers/${Date.now()}-img.jpg`);
@@ -186,12 +148,10 @@ const Flowers = () => {
             }
 
             if (form.id) {
-                // update
                 await updateDoc(doc(FIREBASE_DB, 'flowers', form.id), dataToSave);
             } else {
-                // add new
                 const docRef = await addDoc(collection(FIREBASE_DB, 'flowers'), dataToSave);
-                form.id = docRef.id; // so if you stayed open you’d see the new ID
+                form.id = docRef.id;
             }
 
             await getFlowers();
@@ -205,6 +165,23 @@ const Flowers = () => {
 
     return (
         <View className="flex-1 bg-stone-200 items-center">
+
+            {/* Back Button*/}
+            <TouchableOpacity
+                onPress={() => router.back()}
+                style={{
+                    position: "absolute",
+                    top: 90, // adjust for your header spacing or SafeArea
+                    left: 24,
+                    zIndex: 999, // so it floats above
+                    backgroundColor: "rgba(242,240,238,0.85)",
+                    borderRadius: 999,
+                    padding: 8,
+                }}
+            >
+                <Feather name="arrow-left" size={28} color="#4D7C57" />
+            </TouchableOpacity>
+
             <Text className="text-4xl mt-28 mb-4 font-bodyBold color-mygreen">
                 My Flowers
             </Text>
@@ -228,73 +205,14 @@ const Flowers = () => {
                 />
             )}
 
-            {/* ── Details Modal ─────────────────────────────────────────── */}
-            <Modal visible={!!selectedFlower} transparent animationType="slide">
-                <View className="flex-1 justify-center items-center bg-black/50">
-                    <View className="bg-stone-300 rounded-2xl p-6 w-3/4">
-                        <Text className="text-2xl font-bodyBold text-mygreen">
-                            {selectedFlower?.common_name}
-                        </Text>
-                        <Text className="font-body text-stone-500 mb-2">
-                            {selectedFlower?.scientific_name}
-                        </Text>
-                        {selectedFlower?.default_image &&
-                            <Image
-                               source={{ uri: selectedFlower?.default_image?.thumbnail }}
-                               className="w-full h-40 mt-2 rounded-lg mb-2"
-                              resizeMode="cover"
-                            />
-                        }
-                        <Text className="font-body text-stone-500 mb-1">
-                            Season: {selectedFlower?.flowering_season}
-                        </Text>
-                        <Text className="font-body text-stone-500 mb-1">
-                            Cycle: {selectedFlower?.cycle}
-                        </Text>
-                        <Text className="font-body text-stone-500 mb-1">
-                            Watering: {selectedFlower?.watering}
-                        </Text>
-                        <Text className="font-body text-stone-500 mb-1">
-                            Sunlight: {selectedFlower?.sunlight}
-                        </Text>
-                        {selectedFlower?.hardiness && selectedFlower?.hardiness?.max > 0 &&
-                            <Text className="font-body text-stone-500 mb-1">
-                                Hardiness: Min: {selectedFlower?.hardiness.min} Max: {selectedFlower?.hardiness.max}
-                            </Text>
-                        }
-                        <Text className="font-body text-stone-500 mb-1">
-                            Description: {selectedFlower?.description}
-                        </Text>
+            <DetailsModal
+                visible={!!selectedFlower}
+                flower={selectedFlower!}
+                onEdit={() => openEditForm(selectedFlower!)}
+                onDelete={() => deleteFlower(selectedFlower!.id)}
+                onClose={() => setSelectedFlower(null)}
+            ></DetailsModal>
 
-
-                        <View className="flex-row justify-center mt-4 space-x-2">
-                            <Button
-                                title="Edit"
-                                color="#5f8b4c"
-                                onPress={() => {
-                                    openEditForm(selectedFlower!);
-                                    setSelectedFlower(null);
-                                }}
-                            />
-                            <Button
-                                title="Delete"
-                                color="#d9534f"
-                                onPress={async () => {
-                                    await deleteFlower(selectedFlower!.id);
-                                    setSelectedFlower(null);
-                                }}
-                            />
-                            <Button
-                                title="Close"
-                                color="#5f8b4c"
-                                onPress={() => setSelectedFlower(null)}
-                            />
-                        </View>
-                    </View>
-                </View>
-            </Modal>
-
-            {/* ── Add/Edit Form Modal ───────────────────────────────────── */}
             <TouchableOpacity
                 onPress={openAddForm}
                 className="absolute bottom-12 right-10 bg-mygreen w-20 h-20 rounded-full items-center justify-center shadow-lg"

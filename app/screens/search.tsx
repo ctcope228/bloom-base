@@ -1,21 +1,18 @@
-import {View, Text, ActivityIndicator, FlatList, Button, Modal, Image, Alert} from 'react-native'
+import {View, Text, ActivityIndicator, FlatList, Alert} from 'react-native'
 import React, {useEffect, useState} from 'react'
 import FlowerSearchBar from "@/components/FlowerSearchBar";
 import FlowerCard from "@/components/FlowerCard";
 import {useFetch} from "@/services/usefetch"
-import {fetchFlowerDetails, fetchFlowerList, FlowerDetail} from "@/services/api";
+import {fetchFlowerDetails, fetchFlowerList} from "@/services/api";
 import {addDoc, collection} from "@firebase/firestore";
 import {FIREBASE_DB} from "@/firebase-config";
 import { showMessage } from "react-native-flash-message";
-import {Feather} from "@expo/vector-icons";
-
-function Icon(props: { name: string, size: number, color: string }) {
-    return null;
-}
+import {Flower} from "@/types/flower";
+import DetailsModal from "@/components/DetailsModal";
 
 const Search = () => {
     const [query, setQuery]           = useState("");
-    const [detail, setDetail]         = useState<FlowerDetail | null>(null);
+    const [detail, setDetail]         = useState<Flower | null>(null);
 
     // 1) set autoFetch=false so it waits for us to call refetch()
     const {
@@ -30,7 +27,6 @@ const Search = () => {
         console.log("🌸 Search results for", query, "=>", results);
     }, [results]);
 
-    // 2) Debounce typing → loadResults() or resetResults()
     useEffect(() => {
         const t = setTimeout(() => {
             if (query.trim()) loadResults();
@@ -39,7 +35,6 @@ const Search = () => {
         return () => clearTimeout(t);
     }, [query]);
 
-    // 3) Imperative detail fetch on card press
     const openDetail = async (id: number) => {
         try {
             const d = await fetchFlowerDetails(id);
@@ -103,32 +98,12 @@ const Search = () => {
                 )}
             />
 
-            <Modal visible={!!detail} animationType="slide" transparent>
-                <View className="flex-1 justify-center items-center bg-black/50">
-                    <View className="bg-stone-300 rounded-2xl p-6 w-3/4">
-
-                        <Text className="capitalize text-2xl font-bodyBold text-mygreen mb-2">
-                            {detail?.common_name}
-                        </Text>
-                        {detail?.default_image && <Image
-                            source={{ uri: detail?.default_image.medium_url }}
-                            className="h-48 w-full mb-4 rounded-lg"
-                        />}
-                        <Text className="font-body text-stone-600 mb-1">Season: {detail?.flowering_season}</Text>
-                        <Text className="font-body text-stone-600 mb-1">Cycle: {detail?.cycle}</Text>
-                        <Text className="font-body text-stone-600 mb-1">Watering: {detail?.watering}</Text>
-                        <Text className="font-body text-stone-600 mb-1">Sunlight: {detail?.sunlight}</Text>
-                        {detail?.hardiness && <Text className="font-body text-stone-600 mb-1">Hardiness: Min: {detail?.hardiness.min}, Max: {detail?.hardiness.max}</Text>}
-                        <Text className="font-body text-stone-600 mb-1">Description: {detail?.description}</Text>
-
-                        <View className="flex-row justify-between mt-4">
-                            <Button title="Close" color="#5f8b4c" onPress={() => setDetail(null)} />
-
-                            <Button title="Save" color="#5f8b4c" onPress={handleSave} />
-                        </View>
-                    </View>
-                </View>
-            </Modal>
+            <DetailsModal
+                visible={!!detail}
+                flower={detail!}
+                onClose={() => setDetail(null)}
+                onSave={handleSave}
+            ></DetailsModal>
         </View>
     )
 }
